@@ -6,6 +6,8 @@ const { runAutomation } = require('./automator');
 const { extractBusinessDetails } = require('./ai');
 const { initializeKnowledgeBase } = require('./rag');
 
+const WHATSAPP_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -68,6 +70,93 @@ app.post('/api/chat-to-form', async (req, res) => {
         broadcastUpdate({ status: 'error', message: 'Failed to process AI request.' });
     }
 });
+
+/**
+ * 1. Webhook Verification
+ * Meta requires this endpoint to verify you actually own the server.
+ */
+app.get('/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode === 'subscribe' && token === WHATSAPP_TOKEN) {
+        console.log('✅ WhatsApp Webhook Verified!');
+        res.status(200).send(challenge);
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+/**
+ * 2. Receiving Messages
+ * This is where WhatsApp sends the text messages from your users.
+ */
+app.post('/webhook', async (req, res) => {
+    const body = req.body;
+
+    if (body.object) {
+        if (body.entry && body.entry[0].changes && body.entry[0].changes[0].value.messages && body.entry[0].changes[0].value.messages[0]) {
+            
+            const message = body.entry[0].changes[0].value.messages[0];
+            const senderPhone = message.from;
+            const textText = message.text.body;
+
+            console.log(`📱 WhatsApp from ${senderPhone}: ${textText}`);
+
+            // 1. Acknowledge receipt to Meta instantly (crucial so they don't retry)
+            res.sendStatus(200);
+
+            try {
+                // 2. Tell the user we are thinking
+                await sendWhatsAppMessage(senderPhone, "Checking government databases for your best match...");
+                
+                // 3. Let Gemini do the heavy lifting
+                const userData = await extractBusinessDetails(textText);
+                
+                // 4. Send the Magic Link back to WhatsApp
+                const magicLink = "http://localhost:3000"; // Your Next.js frontend
+                const successMsg = `Great news! You are eligible for the *${userData.recommendedScheme}*.\n\nClick your Magic Link to watch me fill your registration live: ${magicLink}`;
+                await sendWhatsAppMessage(senderPhone, successMsg);
+
+                // 5. Trigger the Playwright browser automation
+                await runAutomation(userData, broadcastUpdate);
+
+            } catch (error) {
+                console.error("Webhook processing error:", error);
+                await sendWhatsAppMessage(senderPhone, "Sorry, I hit a snag checking the databases. Let's try again.");
+            }
+
+        } else {
+            res.sendStatus(200);
+        }
+    } else {
+        res.sendStatus(404);
+    }
+});
+
+// Function to send a WhatsApp message back to the user
+async function sendWhatsAppMessage(toPhone, messageText) {
+    const url = `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`;
+    
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.WHATSAPP_API_TOKEN}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: toPhone,
+                type: "text",
+                text: { body: messageText }
+            })
+        });
+    } catch (error) {
+        console.error("Failed to send WhatsApp message:", error);
+    }
+}
 
 initializeKnowledgeBase();
 
