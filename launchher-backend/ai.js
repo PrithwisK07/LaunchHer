@@ -1,25 +1,26 @@
 const { GoogleGenerativeAI, SchemaType } = require("@google/generative-ai");
+const { findMatchingScheme } = require('./rag'); // Import our new RAG engine
 require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// We define exactly what we want the AI to give us back
 const schema = {
     type: SchemaType.OBJECT,
     properties: {
-        businessName: { 
+        businessName: { type: SchemaType.STRING },
+        nicCode: { type: SchemaType.STRING },
+        recommendedScheme: { 
             type: SchemaType.STRING, 
-            description: "The name of the business. If not provided, suggest a professional one based on their name/activity." 
+            description: "The name of the best matching government scheme." 
         },
-        nicCode: { 
+        eligibilityReason: { 
             type: SchemaType.STRING, 
-            description: "The official 4-digit Indian Udyam NIC code that best matches the business activity described." 
+            description: "A one-sentence explanation of why they qualify for this scheme." 
         }
     },
-    required: ["businessName", "nicCode"]
+    required: ["businessName", "nicCode", "recommendedScheme", "eligibilityReason"]
 };
 
-// Initialize the fast, free tier model
 const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
     generationConfig: {
@@ -29,14 +30,24 @@ const model = genAI.getGenerativeModel({
 });
 
 async function extractBusinessDetails(userMessage) {
+    // 1. Query our Vector Store for relevant schemes
+    const relevantSchemesContext = await findMatchingScheme(userMessage);
+
+    // 2. Inject the context into the prompt
     const prompt = `
     You are an expert Indian business formalization assistant. 
-    Analyze the user's message, extract their business details, and determine the correct 4-digit NIC code for Udyam registration.
+    Analyze the user's message, extract their business details, determine the 4-digit NIC code, 
+    and recommend the best government scheme based ONLY on the provided context.
+
     User Message: "${userMessage}"
+    
+    Available Government Schemes Context:
+    """
+    ${relevantSchemesContext}
+    """
     `;
 
     const result = await model.generateContent(prompt);
-    // The response is guaranteed to be a JSON string matching our schema
     return JSON.parse(result.response.text());
 }
 

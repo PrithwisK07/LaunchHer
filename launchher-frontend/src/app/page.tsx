@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send, CheckCircle2, Loader2, Bot } from "lucide-react";
+import { Send, CheckCircle2, Bot, Sparkles } from "lucide-react";
 
 export default function MagicLinkDashboard() {
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState<{role: string, text: string}[]>([]);
   const [agentState, setAgentState] = useState<any>({ step: "idle", message: "Waiting for user input..." });
   
-  // Ref to automatically scroll chat to bottom
+  // NEW: Dedicated state to hold the AI extracted data permanently
+  const [formData, setFormData] = useState<any>(null);
+  
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // 1. Listen to the Backend SSE Stream
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:3001/api/stream");
 
@@ -19,22 +20,25 @@ export default function MagicLinkDashboard() {
       const data = JSON.parse(event.data);
       console.log("Live Agent Update:", data);
       setAgentState(data);
+      
+      // If the backend sent the full user data, save it so it doesn't disappear!
+      if (data.userData) {
+        setFormData(data.userData);
+      }
     };
 
     return () => eventSource.close();
   }, []);
 
-  // 2. Send Chat to Backend
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    // Add user message to UI
     setMessages(prev => [...prev, { role: "user", text: chatInput }]);
     const currentInput = chatInput;
     setChatInput("");
+    setFormData(null); // Reset form for a new chat
 
-    // Call our Node.js endpoint
     try {
       await fetch("http://localhost:3001/api/chat-to-form", {
         method: "POST",
@@ -82,16 +86,14 @@ export default function MagicLinkDashboard() {
       {/* RIGHT SIDE: Live Agent Visualizer */}
       <div className="w-2/3 p-12 flex flex-col justify-center items-center bg-gray-50 relative overflow-hidden">
         
-        {/* Status Badge */}
         <div className="absolute top-8 right-8 bg-white px-4 py-2 rounded-full shadow-sm flex items-center gap-2 border border-gray-200">
           {agentState.step === "idle" || agentState.step === "complete" ? 
             <span className="w-2 h-2 rounded-full bg-green-500"></span> : 
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
           }
-          <span className="text-sm font-medium text-gray-700 capitalize">Agent Status: {agentState.step}</span>
+          <span className="text-sm font-medium text-gray-700 capitalize">Agent Status: {agentState.step.replace('_', ' ')}</span>
         </div>
 
-        {/* Dynamic Visualizer Card */}
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 p-8 transition-all duration-500">
           
           <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100">
@@ -104,24 +106,34 @@ export default function MagicLinkDashboard() {
             </div>
           </div>
 
-          {/* Form Field Mockups */}
+          {/* NEW: AI Scheme Recommendation Card */}
+          {formData?.recommendedScheme && (
+            <div className="mb-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-2 text-emerald-800 font-bold mb-1">
+                <Sparkles size={18} />
+                Scheme Match Found
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">{formData.recommendedScheme}</h3>
+              <p className="text-sm text-emerald-700 mt-1">{formData.eligibilityReason}</p>
+            </div>
+          )}
+
           <div className="space-y-6">
             <div className={`p-4 rounded-lg border ${agentState.field === 'Business Name' ? 'border-blue-500 bg-blue-50/50' : 'border-gray-100'} transition-colors`}>
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Business Name</label>
               <div className="text-lg font-medium mt-1 min-h-[28px]">
-                {agentState.field === 'Business Name' ? <span className="text-blue-600 font-bold">{agentState.value}</span> : <span className="text-gray-300">Awaiting input...</span>}
+                {formData?.businessName ? <span className="text-gray-800 font-bold">{formData.businessName}</span> : <span className="text-gray-300">Awaiting input...</span>}
               </div>
             </div>
 
             <div className={`p-4 rounded-lg border ${agentState.field === 'NIC Code' ? 'border-blue-500 bg-blue-50/50' : 'border-gray-100'} transition-colors`}>
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Udyam NIC Classification Code</label>
               <div className="text-lg font-medium mt-1 min-h-[28px]">
-                {agentState.field === 'NIC Code' ? <span className="text-blue-600 font-bold">{agentState.value}</span> : <span className="text-gray-300">Awaiting input...</span>}
+                {formData?.nicCode ? <span className="text-gray-800 font-bold">{formData.nicCode}</span> : <span className="text-gray-300">Awaiting input...</span>}
               </div>
             </div>
           </div>
 
-          {/* Success State */}
           {agentState.step === 'complete' && (
             <div className="mt-8 p-4 bg-green-50 rounded-xl flex items-center gap-3 text-green-700 border border-green-100">
               <CheckCircle2 className="text-green-500" />

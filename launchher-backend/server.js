@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const { runAutomation } = require('./automator');
 const { extractBusinessDetails } = require('./ai');
+const { initializeKnowledgeBase } = require('./rag');
 
 const app = express();
 app.use(cors());
@@ -17,7 +18,7 @@ app.get('/api/stream', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     connectedClients.push(res);
-
+    
     req.on('close', () => {
         connectedClients = connectedClients.filter(client => client !== res);
     });
@@ -33,7 +34,7 @@ app.post('/api/start-agent', async (req, res) => {
     const { userData } = req.body;
     
     res.status(200).json({ message: "AI Agent dispatched." });
-
+    
     try {
         await runAutomation(userData, broadcastUpdate);
     } catch (error) {
@@ -44,13 +45,13 @@ app.post('/api/start-agent', async (req, res) => {
 /**
  * 3. The "Chat to Form" Endpoint
  * Takes raw natural language, uses AI to extract JSON, and triggers the bot.
- */
+*/
 app.post('/api/chat-to-form', async (req, res) => {
     const { message } = req.body;
     
     // Respond immediately so the frontend knows we received the message
     res.status(200).json({ status: "Received, AI is processing..." });
-
+    
     try {
         // 1. Tell the frontend we are thinking
         broadcastUpdate({ step: 'ai_parsing', message: 'AI is analyzing your business details to find the right NIC codes...' });
@@ -67,6 +68,8 @@ app.post('/api/chat-to-form', async (req, res) => {
         broadcastUpdate({ status: 'error', message: 'Failed to process AI request.' });
     }
 });
+
+initializeKnowledgeBase();
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
