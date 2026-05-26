@@ -58,11 +58,15 @@ const QUESTION_TRANSLATIONS: Record<string, Record<string, string>> = {
 
 export const ChatContainer = () => {
   const { 
-    messages, addMessage, updateProfileField, clearOptionsFromLastMessage, 
+    messages, addMessage: addMessageBase, updateProfileField, clearOptionsFromLastMessage, 
     isBotTyping, setBotTyping, profile, setSidePanel, isSidePanelOpen, 
     sidePanelView, sidePanelData, isCallMode, setCallMode,
     isOnboardingComplete, setOnboardingComplete
   } = useChatStore();
+  const addMessage = addMessageBase as (message: Message & {
+    matchedSchemes?: any;
+    requiresUpload?: boolean;
+  }) => void;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
