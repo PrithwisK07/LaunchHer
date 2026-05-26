@@ -1,5 +1,6 @@
 import React from 'react';
 import { useChatStore } from '@/store/useChatStore';
+import { useReadAloud } from '@/hooks/useReadAloud';
 import { 
   TrendingUp, Rocket, ShieldCheck, FileText, Lightbulb, 
   AlertTriangle, Banknote, Globe, Clock, Building2,
@@ -56,7 +57,7 @@ const CONTENT: Record<string, any> = {
     },
     alert: { title: "Recognition ≠ Auto Tax Benefits", desc: "DPIIT Recognition is just step one. To actually claim the 3-year tax holiday under Section 80IAC, you must file a separate application to the Inter-Ministerial Board (IMB)." }
   },
-  hi: { // HINDI
+  hi: { 
     hero: { title: "DPIIT मान्यता", desc: "नवीन, स्केलेबल और तकनीकी कंपनियों के लिए बड़े कर और कानूनी लाभों को अनलॉक करने के लिए आधिकारिक सरकारी मान्यता।" },
     eligibility: {
       title: "पात्रता मानदंड",
@@ -102,7 +103,7 @@ const CONTENT: Record<string, any> = {
     },
     alert: { title: "मान्यता ≠ स्वचालित कर लाभ", desc: "DPIIT मान्यता केवल पहला कदम है। 80IAC के तहत 3 साल के कर अवकाश का दावा करने के लिए, आपको IMB में अलग से आवेदन करना होगा।" }
   },
-  ta: { // TAMIL
+  ta: { 
     hero: { title: "DPIIT அங்கீகாரம்", desc: "புதுமையான மற்றும் தொழில்நுட்பம் சார்ந்த நிறுவனங்களுக்கு வரி மற்றும் சட்டப் பலன்களைத் திறக்க அதிகாரப்பூர்வ அரசு அங்கீகாரம்." },
     eligibility: {
       title: "தகுதி வரம்பு",
@@ -148,7 +149,7 @@ const CONTENT: Record<string, any> = {
     },
     alert: { title: "அங்கீகாரம் ≠ தானியங்கி வரி பலன்கள்", desc: "DPIIT அங்கீகாரம் முதல் படி மட்டுமே. வரி விடுமுறையைப் பெற, நீங்கள் IMB க்கு தனியாக விண்ணப்பிக்க வேண்டும்." }
   },
-  te: { // TELUGU
+  te: { 
     hero: { title: "DPIIT గుర్తింపు", desc: "పన్ను మరియు చట్టపరమైన ప్రయోజనాలను అన్‌లాక్ చేయడానికి వినూత్న, సాంకేతిక ఆధారిత కంపెనీలకు అధికారిక ప్రభుత్వ గుర్తింపు." },
     eligibility: {
       title: "అర్హత ప్రమాణాలు",
@@ -194,7 +195,7 @@ const CONTENT: Record<string, any> = {
     },
     alert: { title: "గుర్తింపు ≠ ఆటోమేటిక్ పన్ను ప్రయోజనాలు", desc: "DPIIT గుర్తింపు మొదటి దశ మాత్రమే. పన్ను మినహాయింపు క్లెయిమ్ చేయడానికి మీరు IMB కి విడిగా దరఖాస్తు చేయాలి." }
   },
-  bn: { // BENGALI
+  bn: { 
     hero: { title: "DPIIT স্বীকৃতি", desc: "উদ্ভাবনী, প্রযুক্তি-চালিত কোম্পানিগুলির জন্য কর এবং আইনি সুবিধাগুলি আনলক করার জন্য অফিসিয়াল সরকারী স্বীকৃতি।" },
     eligibility: {
       title: "যোগ্যতার মানদণ্ড",
@@ -240,7 +241,7 @@ const CONTENT: Record<string, any> = {
     },
     alert: { title: "স্বীকৃতি ≠ স্বয়ংক্রিয় কর সুবিধা", desc: "DPIIT স্বীকৃতি শুধুমাত্র প্রথম ধাপ। কর অবকাশ দাবি করার জন্য আপনাকে আলাদাভাবে IMB এর কাছে আবেদন করতে হবে।" }
   },
-  kan: { // KANNADA
+  kan: { 
     hero: { title: "DPIIT ಮಾನ್ಯತೆ", desc: "ತೆರಿಗೆ ಮತ್ತು ಕಾನೂನು ಪ್ರಯೋಜನಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು ನವೀನ ಮತ್ತು ತಂತ್ರಜ್ಞಾನ-ಚಾಲಿತ ಕಂಪನಿಗಳಿಗೆ ಅಧಿಕೃತ ಸರ್ಕಾರಿ ಮಾನ್ಯತೆ." },
     eligibility: {
       title: "ಅರ್ಹತೆಯ ಮಾನದಂಡ",
@@ -288,21 +289,44 @@ const CONTENT: Record<string, any> = {
   }
 };
 
-// Map icons to the arrays so they render properly
 const ELIGIBILITY_ICONS = [Building2, Clock, TrendingUp, Lightbulb];
 const FINANCIAL_ICONS = [ShieldCheck, FileText, TrendingUp, Briefcase];
 const OPERATIONAL_ICONS = [FileText, Clock, Scale, Globe];
 
 export const StartupIndiaGuide = () => {
-  // Grab the language from the global store, fallback to English
   const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
-  
-  // Safely select the translation dictionary
+  const { readAloud, isPlaying } = useReadAloud();
   const t = CONTENT[langCode] || CONTENT['en'];
+
+  const getGuideText = () => [
+    t.hero.title, t.hero.desc,
+    t.eligibility.title,
+    ...t.eligibility.items.flatMap((i: any) => [i.title, i.desc]),
+    t.financial.title,
+    ...t.financial.items.flatMap((i: any) => [i.title, i.desc]),
+    t.operational.title,
+    ...t.operational.items.flatMap((i: any) => [i.title, i.desc]),
+    t.ffs.title, t.ffs.desc, t.ffs.label, t.ffs.value,
+    t.apply.title,
+    ...t.apply.items.flatMap((i: any) => [i.step, i.title, i.desc]),
+    t.alert.title, t.alert.desc
+  ].join('. ');
 
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
       
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-indigo-200 hover:text-indigo-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F5F3FF] border border-indigo-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative ">
@@ -443,3 +467,4 @@ export const StartupIndiaGuide = () => {
     </div>
   );
 };
+

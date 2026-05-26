@@ -14,6 +14,7 @@ import {
   Package
 } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
+import { useReadAloud } from '@/hooks/useReadAloud';
 
 // --------------------------------------------------------
 // VISUAL GUIDE TRANSLATIONS
@@ -173,7 +174,7 @@ const FSSAI_TRANSLATIONS: Record<string, Record<string, string>> = {
     'Renewal is Required': 'নবায়ন প্রয়োজন',
     'Renew annually or up to 5 years at once. Apply 30 days before expiry to avoid fines up to ₹5 Lakhs.': 'বার্ষিক বা একবারে ৫ বছর পর্যন্ত নবায়ন করুন। ₹৫ লাখ পর্যন্ত জরিমানা এড়াতে মেয়াদের ৩০ দিন আগে আবেদন করুন।',
     'Mandatory Display Rule': 'বাধ্যতামূলক প্রদর্শন নিয়ম',
-    'The 14-digit FSSAI number must be visible at your premises and printed on all food packaging.': '১৪-সংখ্যার FSSAI নম্বরটি আপনার প্রাঙ্গনে দৃশ্যমান হতে হবে এবং সমস্ত খাদ্য প্যাকেজিংয়ে মুদ্রিত হতে হবে।'
+    'The 14-digit FSSAI number must be visible at your premises and printed on all food packaging.': '১৪-সংখ্যার FSSAI নম্বরটি আপনার প্রাঙ্গনে দৃশ্যমান হতে হবে এবং সমস্ত খাদ্য প্যাকেজিংয়ে মুদ্রিত হতে হবে.'
   },
   kan: {
     'Food Safety License': 'ಆಹಾರ ಸುರಕ್ಷತೆ ಪರವಾನಗಿ',
@@ -217,15 +218,48 @@ const FSSAI_TRANSLATIONS: Record<string, Record<string, string>> = {
 };
 
 export const FssaiGuide = () => {
-  // Grab the language state from Zustand (Defaults to 'en')
   const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
+  const { readAloud, isPlaying } = useReadAloud();
   
-  // Translation Helper Function
   const t = (text: string) => FSSAI_TRANSLATIONS[langCode]?.[text] || text;
+
+  // Collect all visible text in reading order
+  const getGuideText = () => [
+    t('Food Safety License'),
+    t('Mandatory for anyone touching, cooking, packing, transporting, or selling food. Governed by the FSSAI.'),
+    t('Which license do you need?'),
+    t('Basic Registration'), t('Turnover below ₹12 Lakhs/yr'), t('Fee: ₹100 per year'), t('Best for: Petty vendors, roadside stalls, and home-based businesses.'),
+    t('State License'), t('Turnover ₹12L to ₹20 Cr/yr'), t('Fee: ₹2,000 to ₹5,000 per year'), t('Best for: Restaurants, cloud kitchens, caterers, and mid-sized makers.'),
+    t('Central License'), t('Turnover above ₹20 Crores/yr'), t('Fee: ₹7,500 per year'), t('Required for: Large manufacturers, importers, and multi-state operations.'),
+    t('Who exactly needs it?'),
+    t('Eateries & Kitchens'), t('Restaurants & cloud kitchens'),
+    t('Retail & Grocery'), t('Marts & roadside stalls'),
+    t('Transport'), t('Cold storage & aggregators'),
+    t('Manufacturing'), t('Processing & dairy units'),
+    t('Documents Required'),
+    t('Owner ID'), t('Govt-issued Photo ID'),
+    t('Premises Proof'), t('Rental or ownership doc'),
+    t('Safety Plan'), t('For State/Central only'),
+    t('Product List'), t('Items manufactured/sold'),
+    t('Renewal is Required'), t('Renew annually or up to 5 years at once. Apply 30 days before expiry to avoid fines up to ₹5 Lakhs.'),
+    t('Mandatory Display Rule'), t('The 14-digit FSSAI number must be visible at your premises and printed on all food packaging.'),
+  ].join('. ');
 
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
       
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-orange-100 text-orange-700 border border-orange-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#FFF8F3] border border-orange-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative">

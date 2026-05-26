@@ -1,5 +1,6 @@
 import React from "react";
 import { useChatStore } from "@/store/useChatStore";
+import { useReadAloud } from "@/hooks/useReadAloud";
 import {
   Landmark,
   AlertTriangle,
@@ -203,13 +204,10 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
 };
 
 export const UdyamGuide = () => {
-  // Grab the language from the store, defaulting to English
   const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
-  
-  // Translation helper function
+  const { readAloud, isPlaying } = useReadAloud();
   const t = (text: string) => TRANSLATIONS[langCode]?.[text] || text;
 
-  // We define these arrays inside the component so the t() function triggers on re-render
   const registrationSteps = [
     { icon: MonitorSmartphone, title: t("1. Visit Portal"), desc: "udyamregistration.gov.in" },
     { icon: Fingerprint, title: t("2. Verification"), desc: t("Aadhaar & PAN OTP") },
@@ -225,8 +223,43 @@ export const UdyamGuide = () => {
     { icon: Globe, title: t("Export Boost"), desc: t("Global trade schemes") },
   ];
 
+  const getGuideText = () => [
+    t("The Business Aadhaar"),
+    t("Official MSME recognition by the Govt. of India. Provides a lifetime unique 19-digit identifier (URN)."),
+    t("Classification Tiers"),
+    t("Micro Enterprise"), t("Inv: ≤ ₹1 Cr"), t("Turn: ≤ ₹5 Cr"),
+    t("Small Enterprise"), t("Inv: ≤ ₹10 Cr"), t("Turn: ≤ ₹50 Cr"),
+    t("Medium Enterprise"), t("Inv: ≤ ₹50 Cr"), t("Turn: ≤ ₹250 Cr"),
+    t("Registration Flow"),
+    t("1. Visit Portal"), "udyamregistration.gov.in",
+    t("2. Verification"), t("Aadhaar & PAN OTP"),
+    t("3. Business Info"), t("Bank details & NIC"),
+    t("4. Instant Issue"), t("Download certificate"),
+    t("Unlocked Benefits"),
+    t("No Collateral"), t("Loans up to ₹5 Cr"),
+    t("Payment Shield"), t("45-day delay cover"),
+    t("Tenders"), t("Deposit exemptions"),
+    t("Lower Rates"), t("2% bank subvention"),
+    t("Export Boost"), t("Global trade schemes"),
+    t("100% Free Portal"),
+    t("Registration costs ₹0. Private agents charging fees are scams. Always ensure you are using the official ") + ".gov.in" + t(" domain.")
+  ].join('. ');
+
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
+      
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-blue-200 hover:text-blue-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F4F7FF] border border-blue-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative ">

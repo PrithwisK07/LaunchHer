@@ -1,5 +1,6 @@
 import React from 'react';
 import { useChatStore } from '@/store/useChatStore';
+import { useReadAloud } from '@/hooks/useReadAloud';
 import { 
   Users, 
   Coins, 
@@ -224,15 +225,38 @@ const TRANSLATIONS: Record<string, any> = {
 };
 
 export const ShgGuide = () => {
-  // Grab the current language from the Zustand store, default to English
   const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
-  
-  // Select the appropriate translation object
+  const { readAloud, isPlaying } = useReadAloud();
   const t = TRANSLATIONS[langCode] || TRANSLATIONS['en'];
+
+  const getGuideText = () => [
+    t.heroTitle, t.heroDesc,
+    t.howItWorksTitle,
+    ...t.howItWorks.flatMap((step: any) => [step.step, step.title, step.desc]),
+    t.benefitsTitle,
+    ...t.benefits.flatMap((b: any) => [b.title, b.desc]),
+    t.nrlmTitle, t.nrlmDesc,
+    ...t.nrlmPoints.flatMap((p: any) => [p.label, p.value]),
+    t.stateProgramsTitle,
+    ...t.statePrograms.flatMap((p: any) => [p.scope, p.name]),
+    t.footerTitle, t.footerDesc
+  ].join('. ');
 
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
       
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-pink-100 text-pink-700 border border-pink-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-pink-200 hover:text-pink-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#FFF5F8] border border-pink-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative ">

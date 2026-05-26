@@ -1,5 +1,6 @@
 import React from 'react';
 import { useChatStore } from '@/store/useChatStore';
+import { useReadAloud } from '@/hooks/useReadAloud';
 import { 
   BadgePercent, 
   ShoppingCart, 
@@ -206,12 +207,25 @@ const CONTENT: Record<string, any> = {
 };
 
 export const GstGuide = () => {
-  // Grab the user's preferred language from Zustand, fallback to 'en'
-  const preferredLanguage = useChatStore((state) => state.profile.preferredLanguage) || 'en';
-  // Use English as a fallback if a specific language dictionary is missing
-  const content = CONTENT[preferredLanguage as string] || CONTENT['en'];
+  const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
+  const { readAloud, isPlaying } = useReadAloud();
+  const content = CONTENT[langCode] || CONTENT['en'];
 
-  // Static styling mapping for the slabs to keep logic clean
+  const getGuideText = () => [
+    content.title, content.subtitle,
+    content.slabsTitle,
+    ...content.slabs.flatMap((s: any) => [s.rate, s.label, s.desc]),
+    '28% + Cess', content.luxuryDesc,
+    content.triggersTitle,
+    ...content.triggers.flatMap((t: any) => [t.title, t.desc]),
+    content.itcTitle, content.itcDesc,
+    content.collected, '₹30k', content.paid, '₹18k', content.youOwe, '₹12k',
+    content.calendarTitle,
+    content.sales, content.salesDate,
+    content.payment, content.paymentDate,
+    content.penaltyTitle, content.penaltyDesc
+  ].join('. ');
+
   const slabStyles = [
     { bg: 'bg-[#F8FAFC]', border: 'border-slate-200', text: 'text-slate-700' },
     { bg: 'bg-[#F4F8FF]', border: 'border-blue-100', text: 'text-blue-700' },
@@ -219,12 +233,23 @@ export const GstGuide = () => {
     { bg: 'bg-[#FFF4ED]', border: 'border-orange-200', text: 'text-orange-700' },
   ];
 
-  // Icons for triggers
   const triggerIcons = [Building2, Truck, ShoppingCart, Globe];
 
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
       
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-blue-200 hover:text-blue-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F4F7FF] border border-blue-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative ">
