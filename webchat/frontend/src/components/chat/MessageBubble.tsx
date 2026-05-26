@@ -42,7 +42,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "Extracting Details...",
     network_error: "Network error. Please ensure the OCR backend is running.",
     ocr_success_msg: "I have uploaded my documents. Please review the extracted details.",
-    upload_success: "Documents processed successfully!"
+    upload_success: "Documents processed successfully! Redirecting..."
   },
   hi: {
     automated_actions: "स्वचालित कार्रवाइयां उपलब्ध हैं",
@@ -54,7 +54,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "विवरण निकाला जा रहा है...",
     network_error: "नेटवर्क त्रुटि। कृपया सुनिश्चित करें कि OCR बैकएंड चल रहा है।",
     ocr_success_msg: "मैंने अपने दस्तावेज़ अपलोड कर दिए हैं। कृपया निकाले गए विवरणों की समीक्षा करें।",
-    upload_success: "दस्तावेज़ सफलतापूर्वक संसाधित किए गए!"
+    upload_success: "दस्तावेज़ सफलतापूर्वक संसाधित किए गए! अनुप्रेषित किया जा रहा है..."
   },
   ta: {
     automated_actions: "தானியங்கு செயல்கள் உள்ளன",
@@ -66,7 +66,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "விவரங்களைப் பிரித்தெடுக்கிறது...",
     network_error: "நெட்வொர்க் பிழை. OCR பின்புலம் இயங்குகிறதா என்பதை உறுதிப்படுத்தவும்.",
     ocr_success_msg: "நான் எனது ஆவணங்களைப் பதிவேற்றியுள்ளேன். பிரித்தெடுக்கப்பட்ட விவரங்களை மதிப்பாய்வு செய்யவும்.",
-    upload_success: "ஆவணங்கள் வெற்றிகரமாக செயலாக்கப்பட்டன!"
+    upload_success: "ஆவணங்கள் வெற்றிகரமாக செயலாக்கப்பட்டன! வழிமாற்றுகிறது..."
   },
   te: {
     automated_actions: "స్వయంచాలక చర్యలు అందుబాటులో ఉన్నాయి",
@@ -78,7 +78,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "వివరాలను సంగ్రహిస్తోంది...",
     network_error: "నెట్‌వర్క్ లోపం. దయచేసి OCR బ్యాకెండ్ నడుస్తుందో లేదో నిర్ధారించుకోండి.",
     ocr_success_msg: "నేను నా పత్రాలను అప్‌లోడ్ చేసాను. దయచేసి సంగ్రహించిన వివరాలను సమీక్షించండి.",
-    upload_success: "పత్రాలు విజయవంతంగా ప్రాసెస్ చేయబడ్డాయి!"
+    upload_success: "పత్రాలు విజయవంతంగా ప్రాసెస్ చేయబడ్డాయి! దారి మళ్లిస్తోంది..."
   },
   bn: {
     automated_actions: "স্বয়ংক্রিয় ক্রিয়া উপলব্ধ",
@@ -90,7 +90,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "বিবরণ বের করা হচ্ছে...",
     network_error: "নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে নিশ্চিত করুন যে OCR ব্যাকএন্ড চলছে।",
     ocr_success_msg: "আমি আমার নথি আপলোড করেছি। অনুগ্রহ করে নিষ্কাশিত বিবরণ পর্যালোচনা করুন।",
-    upload_success: "নথি সফলভাবে প্রক্রিয়া করা হয়েছে!"
+    upload_success: "নথি সফলভাবে প্রক্রিয়া করা হয়েছে! পুনঃনির্দেশিত করা হচ্ছে..."
   },
   kan: {
     automated_actions: "ಸ್ವಯಂಚಾಲಿತ ಕ್ರಿಯೆಗಳು ಲಭ್ಯವಿದೆ",
@@ -102,7 +102,7 @@ const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     extracting: "ವಿವರಗಳನ್ನು ಹೊರತೆಗೆಯಲಾಗುತ್ತಿದೆ...",
     network_error: "ನೆಟ್‌ವರ್ಕ್ ದೋಷ. ದಯವಿಟ್ಟು OCR ಬ್ಯಾಕೆಂಡ್ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿದೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.",
     ocr_success_msg: "ನಾನು ನನ್ನ ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ಹೊರತೆಗೆಯಲಾದ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.",
-    upload_success: "ದಾಖಲೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸಂಸ್ಕರಿಸಲಾಗಿದೆ!"
+    upload_success: "ದಾಖಲೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸಂಸ್ಕರಿಸಲಾಗಿದೆ! ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ..."
   }
 };
 
@@ -387,8 +387,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       const result = await response.json();
       
       if (result.success) {
+        // --- NEW DATA INJECTION LOGIC ---
         // Extract the required data from your OCR endpoint
-        console.log("Auto-Fill these into UI:", result.data?.categorized?.auto_fill);
+        let autoFillData = result.data?.categorized?.auto_fill;
+        
+        // If no proper data is extracted, fallback to dummy data
+        if (!autoFillData || Object.keys(autoFillData).length === 0) {
+          autoFillData = { name: "prince kumar" };
+          console.log("No proper data extracted. Using dummy data:", autoFillData);
+        } else {
+          console.log("Auto-Fill these into UI:", autoFillData);
+        }
+
         console.log("Ask user to review:", result.data?.categorized?.needs_review);
         
         // Show success banner
@@ -396,6 +406,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         // Notify chat so AI can transition to Playwright confirmation
         onTextSubmit(t.ocr_success_msg);
+        
+        // --- NEW REDIRECT LOGIC ---
+        // Wait 1.5 seconds so the user can see the success state, then redirect
+        setTimeout(() => {
+          window.location.href = "https://women-ent-8q33-74qlh4hcd-priyanshivora1006-8861s-projects.vercel.app/";
+        }, 1500);
+
       } else {
         setUploadError(result.error || "Failed to process documents.");
       }

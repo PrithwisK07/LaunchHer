@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { useChatStore } from '@/store/useChatStore'; // Import the store to read the language
+import { useChatStore } from '@/store/useChatStore';
+import { useReadAloud } from '@/hooks/useReadAloud';
 import { 
   Store, MapPin, Building, AlertTriangle, CheckCircle2, 
   Banknote, FileText, RefreshCw, ShieldCheck, Key, 
@@ -69,17 +71,60 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
 };
 
 export const TradeLicenseGuide = () => {
-  // 1. Grab the user's selected language (defaults to 'en')
   const langCode = (useChatStore((state) => state.profile.preferredLanguage) as string) || 'en';
+  const { readAloud, isPlaying } = useReadAloud();
 
-  // 2. Create a quick translation helper function
   const t = (englishText: string) => {
     return TRANSLATIONS[langCode]?.[englishText] || englishText;
   };
 
+  const getGuideText = () => [
+    t("Shop & Trade License"),
+    t("Mandatory legal permission from your local municipality to operate a physical shop or commercial establishment."),
+    t("Core Rules & Limits"),
+    t("Locally Issued"), t("By Municipal Corp or Panchayat."),
+    t("Zone Specific"), t("Prohibits commercial work in residential zones."),
+    t("Annual Renewal"), t("Must be renewed every 1-3 years."),
+    t("No Property Rights"), t("Permits trading, doesn't prove ownership."),
+    t("Who Needs It?"),
+    t("Retail & Grocery"), t("Supermarkets, kirana, malls"),
+    t("Food & Dining"), t("Restaurants, dhabas, cafes"),
+    t("Services"), t("Salons, gyms, clinics"),
+    t("Industrial"), t("Workshops & warehouses"),
+    t("Documents Required"),
+    t("Govt ID Proof"), t("Aadhaar, PAN, or Passport"),
+    t("Premises Proof"), t("Rental deed or ownership doc"),
+    t("Landlord NOC"), t("Required for rented spaces"),
+    t("Layout Plan"), t("Dimensions of the shop"),
+    t("Estimated Fees"),
+    "Small Shop", "Up to 5 staff", "₹500 – ₹2k",
+    "Medium", "5-20 staff", "₹2k – ₹5k",
+    "Large Estab.", "20+ staff", "₹5k – ₹20k+",
+    "Industrial", "Factories", "Variable",
+    "*Fees vary significantly by municipality",
+    t("Employee Protections Unlocked"),
+    "Working Hours", "Max 9 hours/day and 48 hours/week.",
+    "Rest & Leave", "Mandatory weekly rest day + sick/earned leave.",
+    "Record Keeping", "Must maintain wage and attendance registers.",
+    t("Operate Without It? High Risk."),
+    t("Running a business without a valid trade license can result in heavy fines, sealing of your premises by the local authority, and criminal proceedings.")
+  ].join('. ');
+
   return (
     <div className="w-full flex flex-col gap-5 animate-fade-in-up pb-8">
       
+      {/* READ ALOUD BUTTON */}
+      <button
+        onClick={() => readAloud(getGuideText(), langCode)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all self-start
+          ${isPlaying 
+            ? 'bg-teal-100 text-teal-700 border border-teal-200' 
+            : 'bg-white text-slate-700 border border-gray-200 hover:border-teal-200 hover:text-teal-600'
+          }`}
+      >
+        {isPlaying ? '⏹ Stop' : '🔊 Read out loud'}
+      </button>
+
       {/* HERO SECTION */}
       <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F0FDF8] border border-teal-100 rounded-[2rem] relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)]">
         <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-4 relative ">
@@ -113,8 +158,8 @@ export const TradeLicenseGuide = () => {
               <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 mb-2">
                 <item.icon size={16} className="text-teal-600" />
               </div>
-              <h5 className="font-semibold text-slate-800 text-[12px] mb-0.5">{item.title}</h5>
-              <p className="text-[10px] text-slate-500 leading-snug">{item.desc}</p>
+              <h5 className="font-semibold text-slate-800 text-[12px] mb-0.5">{t(item.title)}</h5>
+              <p className="text-[10px] text-slate-500 leading-snug">{t(item.desc)}</p>
             </div>
           ))}
         </div>
@@ -140,8 +185,8 @@ export const TradeLicenseGuide = () => {
                 <item.icon size={16} className="text-slate-600" />
               </div>
               <div>
-                <h5 className="font-semibold text-slate-800 text-[12px]">{item.title}</h5>
-                <p className="text-[10px] text-slate-500 leading-snug">{item.desc}</p>
+                <h5 className="font-semibold text-slate-800 text-[12px]">{t(item.title)}</h5>
+                <p className="text-[10px] text-slate-500 leading-snug">{t(item.desc)}</p>
               </div>
             </div>
           ))}
@@ -168,8 +213,8 @@ export const TradeLicenseGuide = () => {
                 <doc.icon size={16} className="text-slate-600" />
               </div>
               <div>
-                <h5 className="font-semibold text-slate-800 text-[12px]">{doc.title}</h5>
-                <p className="text-[10px] text-slate-500 line-clamp-1">{doc.desc}</p>
+                <h5 className="font-semibold text-slate-800 text-[12px]">{t(doc.title)}</h5>
+                <p className="text-[10px] text-slate-500 line-clamp-1">{t(doc.desc)}</p>
               </div>
             </div>
           ))}
