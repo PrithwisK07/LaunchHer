@@ -102,7 +102,7 @@ export const ChatContainer = () => {
     // 3. IF ONBOARDING IS DONE: Talk to the Express/JSON Backend
     setBotTyping(true);
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch('https://launchher.onrender.com:8000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -187,7 +187,7 @@ export const ChatContainer = () => {
 
         try {
           // Send the handover directly to the LLM Backend
-          const response = await fetch('http://localhost:8000/chat', {
+          const response = await fetch('https://launchher.onrender.com:8000/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
