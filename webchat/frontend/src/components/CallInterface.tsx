@@ -57,7 +57,7 @@ export const CallInterface = () => {
     let isUserSpeaking = false;
 
     // Hardcoded IP to avoid double-slash bugs
-    const WS_URL = "ws://10.27.0.146:8081/api/v1/automate/ws/onboard/voice/user_123";
+    const WS_URL = "wss://kaarigarconnect-production.up.railway.app/api/v1/automate/ws/onboard/voice/user_id";
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
 

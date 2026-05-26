@@ -377,7 +377,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
     try {
       // 4. Fire the request
-      const OCR_API = process.env.NEXT_PUBLIC_OCR_API_URL || "http://10.27.0.146:8081";
+      const OCR_API = process.env.NEXT_PUBLIC_OCR_API_URL || "kaarigarconnect-production.up.railway.app";
       const response = await fetch(`${OCR_API}/api/v1/automate/ocr`, {
         method: "POST",
         body: formData,
